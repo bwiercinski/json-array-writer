@@ -20,7 +20,7 @@ public class JsonPlaceHolderClient {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToFlux(ObjectNode.class)
-            .doOnError(throwable -> {
+            .onErrorMap(throwable -> {
                 throw new JsonPlaceHolderClientException("Error while processing invokeApi for " + endPoint, throwable);
             });
     }
