@@ -25,8 +25,11 @@ public class JsonNodeWriterService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${lt.ro.fachmann.jsonarraywriter.export-directory:.}")
     private File exportDirectory;
+
+    public JsonNodeWriterService(@Value("${lt.ro.fachmann.jsonarraywriter.export-directory:.}") File exportDirectory) {
+        this.exportDirectory = exportDirectory;
+    }
 
     public WritingStatus write(String endPoint, File subDirectory, JsonNode object) {
         return new WritingStatus(writeValue(endPoint, subDirectory, object), object);
@@ -44,16 +47,15 @@ public class JsonNodeWriterService {
 
     public File createSubDirectory(String endPoint) {
         File endpointDirectory = new File(exportDirectory, endPoint);
-        endpointDirectory.mkdir();
         File subDirectory = new File(endpointDirectory, endPoint + "_" + LocalDateTime.now().format(directoryDateTimeFormatter));
-        subDirectory.mkdir();
+        subDirectory.mkdirs();
         return subDirectory;
     }
 
     private File resolveFileName(File subDirectory, String endPoint, JsonNode jsonNode) {
-        String fileName = endPoint + Optional.ofNullable(jsonNode.findValue("id"))
+        String fileName = String.format("%s-%s.json", endPoint, Optional.ofNullable(jsonNode.findValue("id"))
             .map(JsonNode::asText)
-            .orElse(UUID.randomUUID().toString()) + ".json";
+            .orElse(UUID.randomUUID().toString()));
         return new File(subDirectory, fileName);
     }
 }

@@ -1,13 +1,10 @@
 package lt.fachmann.jsonarraywriter.jsonarraystreamwriter.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import lt.fachmann.jsonarraywriter.jsonarraystreamwriter.client.JsonPlaceHolderClient;
 import lt.fachmann.jsonarraywriter.jsonarraystreamwriter.model.WritingStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.io.File;
@@ -17,8 +14,7 @@ import java.io.File;
 public class StreamWriterService {
 
     @Autowired
-    @Qualifier("jsonPlaceHolderWebClient")
-    private WebClient jsonPlaceHolderWebClient;
+    private JsonPlaceHolderClient jsonPlaceHolderClient;
 
     @Autowired
     private JsonNodeWriterService jsonNodeWriterService;
@@ -28,11 +24,7 @@ public class StreamWriterService {
 
         log.info("Invoking executeWriting for subDirectory: " + subDirectory);
 
-        return jsonPlaceHolderWebClient.get()
-            .uri("/" + endPoint)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToFlux(ObjectNode.class)
+        return jsonPlaceHolderClient.invokeApi(endPoint)
             .map(object -> jsonNodeWriterService.write(endPoint, subDirectory, object))
             .log();
     }
