@@ -31,13 +31,13 @@ public class JsonNodeWriterService {
         this.exportDirectory = exportDirectory;
     }
 
-    public WritingStatus write(String endPoint, File subDirectory, JsonNode object) {
-        return new WritingStatus(writeValue(endPoint, subDirectory, object), object);
+    public WritingStatus write(String requestName, File subDirectory, JsonNode object) {
+        return new WritingStatus(writeValue(requestName, subDirectory, object), object);
     }
 
-    public WritingStatusCode writeValue(String endPoint, File subDirectory, JsonNode object) {
+    public WritingStatusCode writeValue(String requestName, File subDirectory, JsonNode object) {
         try {
-            objectMapper.writeValue(resolveFileName(subDirectory, endPoint, object), object);
+            objectMapper.writeValue(resolveFileName(subDirectory, requestName, object), object);
             return WritingStatusCode.SUCCESS;
         } catch (IOException e) {
             log.error("Failed writing " + object + " into " + subDirectory + ". Cause: " + e.getMessage(), e);
@@ -45,15 +45,15 @@ public class JsonNodeWriterService {
         }
     }
 
-    public File createSubDirectory(String endPoint) {
-        File endpointDirectory = new File(exportDirectory, endPoint);
-        File subDirectory = new File(endpointDirectory, endPoint + "_" + LocalDateTime.now().format(directoryDateTimeFormatter));
+    public File createSubDirectory(String name) {
+        File endpointDirectory = new File(exportDirectory, name);
+        File subDirectory = new File(endpointDirectory, name + "_" + LocalDateTime.now().format(directoryDateTimeFormatter));
         subDirectory.mkdirs();
         return subDirectory;
     }
 
-    private File resolveFileName(File subDirectory, String endPoint, JsonNode jsonNode) {
-        String fileName = String.format("%s-%s.json", endPoint, Optional.ofNullable(jsonNode.findValue("id"))
+    private File resolveFileName(File subDirectory, String requestName, JsonNode jsonNode) {
+        String fileName = String.format("%s-%s.json", requestName, Optional.ofNullable(jsonNode.findValue("id"))
             .map(JsonNode::asText)
             .orElse(UUID.randomUUID().toString()));
         return new File(subDirectory, fileName);

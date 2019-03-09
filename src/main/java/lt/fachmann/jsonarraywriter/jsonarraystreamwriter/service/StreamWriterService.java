@@ -19,13 +19,13 @@ public class StreamWriterService {
     @Autowired
     private JsonNodeWriterService jsonNodeWriterService;
 
-    public Flux<WritingStatus> executeWriting(String endPoint) {
-        File subDirectory = jsonNodeWriterService.createSubDirectory(endPoint);
+    public Flux<WritingStatus> executeWriting(String name, String endPoint) {
+        File subDirectory = jsonNodeWriterService.createSubDirectory(name);
 
         log.info("Invoking executeWriting for subDirectory: " + subDirectory);
 
         return jsonPlaceHolderClient.invokeApi(endPoint)
-            .map(object -> jsonNodeWriterService.write(endPoint, subDirectory, object))
+            .map(object -> jsonNodeWriterService.write(name, subDirectory, object))
             .log();
     }
 }

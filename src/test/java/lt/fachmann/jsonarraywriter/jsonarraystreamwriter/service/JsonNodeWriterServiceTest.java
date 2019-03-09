@@ -24,11 +24,11 @@ public class JsonNodeWriterServiceTest {
     private final String tempDirectoryName = "json-node-writer-test";
     private final File tempDirectory = new File(new File(System.getProperty("java.io.tmpdir")), tempDirectoryName);
 
-    @InjectMocks
-    private JsonNodeWriterService service = new JsonNodeWriterService(tempDirectory);
-
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    @InjectMocks
+    private JsonNodeWriterService service = new JsonNodeWriterService(tempDirectory);
 
     @Before
     public void before() {
