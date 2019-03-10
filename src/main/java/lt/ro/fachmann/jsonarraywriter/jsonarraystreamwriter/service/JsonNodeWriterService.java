@@ -65,12 +65,12 @@ public class JsonNodeWriterService {
     }
 
     private String resolveFileName(String requestName, JsonNode jsonNode) {
-        UnaryOperator<String> fileNameFunction = text -> String.format("%s-%s.json", requestName, text);
+        UnaryOperator<String> fileNameFormatter = id -> String.format("%s-%s.json", requestName, id);
         return Optional.ofNullable(jsonNode.findValue("id"))
             .map(JsonNode::asText)
-            .map(fileNameFunction)
+            .map(fileNameFormatter)
             .filter(text -> text.length() <= 0xff) // max file name length (decimal 255)
             .filter(text -> fileNamePattern.matcher(text).matches())
-            .orElseGet(() -> fileNameFunction.apply(UUID.randomUUID().toString()));
+            .orElseGet(() -> fileNameFormatter.apply(UUID.randomUUID().toString()));
     }
 }
