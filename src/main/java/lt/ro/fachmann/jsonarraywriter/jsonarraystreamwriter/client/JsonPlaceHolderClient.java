@@ -1,7 +1,7 @@
-package lt.fachmann.jsonarraywriter.jsonarraystreamwriter.client;
+package lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.client;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lt.fachmann.jsonarraywriter.jsonarraystreamwriter.exception.JsonPlaceHolderClientException;
+import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.exception.JsonPlaceHolderClientException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,12 @@ import reactor.core.publisher.Flux;
 @Component
 public class JsonPlaceHolderClient {
 
+    private final WebClient jsonPlaceHolderWebClient;
+
     @Autowired
-    private WebClient jsonPlaceHolderWebClient;
+    public JsonPlaceHolderClient(WebClient jsonPlaceHolderWebClient) {
+        this.jsonPlaceHolderWebClient = jsonPlaceHolderWebClient;
+    }
 
     public Flux<ObjectNode> invokeApi(String endPoint) {
         return jsonPlaceHolderWebClient.get()
@@ -20,8 +24,6 @@ public class JsonPlaceHolderClient {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToFlux(ObjectNode.class)
-            .onErrorMap(throwable -> {
-                throw new JsonPlaceHolderClientException("Error while processing invokeApi for " + endPoint, throwable);
-            });
+            .onErrorMap(e -> new JsonPlaceHolderClientException("Error while processing invokeApi for " + endPoint, e));
     }
 }

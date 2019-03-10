@@ -1,4 +1,4 @@
-package lt.fachmann.jsonarraywriter;
+package lt.ro.fachmann.jsonarraywriter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

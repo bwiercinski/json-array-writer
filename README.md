@@ -2,7 +2,7 @@
 
 Spring Boot App for saving various endpoints from `https://jsonplaceholder.typicode.com`
 
-App saves all array elements to separate json files, if endpoint returning object, then it is threaded like one-element-array.
+App saves all array's elements to separate json files, if endpoint is returning object, then it is threaded like one-element-array.
 
 App saves files to `lt.ro.fachmann.jsonarraywriter.export-directory` directory.
 

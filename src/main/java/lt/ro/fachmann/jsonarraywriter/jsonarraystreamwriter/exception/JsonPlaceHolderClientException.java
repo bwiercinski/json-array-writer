@@ -1,4 +1,4 @@
-package lt.fachmann.jsonarraywriter.jsonarraystreamwriter.exception;
+package lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.exception;
 
 public class JsonPlaceHolderClientException extends RuntimeException {
     public JsonPlaceHolderClientException() {

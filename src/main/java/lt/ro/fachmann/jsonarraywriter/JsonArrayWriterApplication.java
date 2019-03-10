@@ -1,4 +1,4 @@
-package lt.fachmann.jsonarraywriter;
+package lt.ro.fachmann.jsonarraywriter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

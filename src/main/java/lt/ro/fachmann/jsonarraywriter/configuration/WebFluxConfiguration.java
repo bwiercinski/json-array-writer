@@ -1,4 +1,4 @@
-package lt.fachmann.jsonarraywriter.configuration;
+package lt.ro.fachmann.jsonarraywriter.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
