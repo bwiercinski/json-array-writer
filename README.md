@@ -10,6 +10,12 @@ App supports streams (`application/stream+json`) so progress of saving files can
 
 ## Usage
 
+### Set up
+
+Run `./mvnw clean install spring-boot:run` or setup this project in Yours favourite IDE
+
+### Testing
+
 `curl http://localhost:8080/executeWriting/{requestName}?endPoint=https%3A%2F%2Fjsonplaceholder.typicode.com%2Ftodos`
 
 * `requestName` - internal name of endpoint (for naming folder with jsons)
