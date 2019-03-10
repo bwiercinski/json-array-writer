@@ -6,6 +6,7 @@ import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.model.WritingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @Slf4j
@@ -26,7 +27,9 @@ public class StreamWriterService {
             .doOnSuccess(subDirectory -> log.info("Invoking executeWriting for subDirectory: " + subDirectory))
             .flux()
             .flatMap(subDirectory -> jsonPlaceHolderClient.invokeApi(endPoint)
-                .flatMap(object -> jsonNodeWriterService.write(name, subDirectory, object))
-                .log());
+                .parallel()
+                .runOn(Schedulers.parallel())
+                .flatMap(object -> jsonNodeWriterService.write(name, subDirectory, object)))
+            .log();
     }
 }
