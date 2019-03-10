@@ -4,9 +4,9 @@ Spring Boot App for saving various endpoints from `https://jsonplaceholder.typic
 
 App saves all array's elements to separate json files, if endpoint is returning object, then it is threaded like one-element-array.
 
-App saves files to `lt.ro.fachmann.jsonarraywriter.export-directory` directory.
+App saves files to `lt.ro.fachmann.jsonarraywriter.export-directory` directory. Files are named with `requestName` and by `"id"` property from their body. If absent or file name is illegal as `id`, random UUID is used.
 
-App supports streams (`application/stream+json`) so progress of saving files can be observed via e.g. `curl`
+App supports streams (`application/stream+json`) so progress of saving files can be observed via e.g. `curl`. **Files are saved in parallel!**
 
 ## Usage
 

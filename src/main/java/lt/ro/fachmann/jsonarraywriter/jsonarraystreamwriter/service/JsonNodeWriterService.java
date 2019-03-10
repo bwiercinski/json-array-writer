@@ -15,12 +15,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 public class JsonNodeWriterService {
 
     private static final DateTimeFormatter directoryDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH.mm.ss.SSS'Z'");
+
+    private static final Pattern fileNamePattern = Pattern.compile("^[\\w\\-.]+\\.json$");
 
     private final ObjectMapper objectMapper;
 
@@ -61,8 +65,12 @@ public class JsonNodeWriterService {
     }
 
     private String resolveFileName(String requestName, JsonNode jsonNode) {
-        return String.format("%s-%s.json", requestName, Optional.ofNullable(jsonNode.findValue("id"))
+        UnaryOperator<String> fileNameFunction = text -> String.format("%s-%s.json", requestName, text);
+        return Optional.ofNullable(jsonNode.findValue("id"))
             .map(JsonNode::asText)
-            .orElse(UUID.randomUUID().toString()));
+            .map(fileNameFunction)
+            .filter(text -> text.length() <= 0xff) // max file name length (decimal 255)
+            .filter(text -> fileNamePattern.matcher(text).matches())
+            .orElseGet(() -> fileNameFunction.apply(UUID.randomUUID().toString()));
     }
 }
