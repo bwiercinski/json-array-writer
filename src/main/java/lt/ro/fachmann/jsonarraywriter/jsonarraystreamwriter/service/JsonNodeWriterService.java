@@ -1,8 +1,8 @@
 package lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.model.Post;
 import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.model.WritingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,18 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 public class JsonNodeWriterService {
 
     private static final DateTimeFormatter directoryDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH.mm.ss.SSS'Z'");
-
-    private static final Pattern fileNamePattern = Pattern.compile("^[\\w\\-.]+\\.json$");
 
     private final ObjectMapper objectMapper;
 
@@ -37,22 +31,9 @@ public class JsonNodeWriterService {
         this.exportDirectory = exportDirectory;
     }
 
-    public Mono<WritingResult> write(String requestName, File subDirectory, JsonNode object) {
-        return writeValue(requestName, subDirectory, object)
-            .map(status -> new WritingResult(status, object));
-    }
-
-    public Mono<WritingResult.Status> writeValue(String requestName, File subDirectory, JsonNode object) {
-        return Mono.fromCallable(() -> {
-            try {
-                File targetFile = new File(subDirectory, resolveFileName(requestName, object));
-                objectMapper.writeValue(targetFile, object);
-                return WritingResult.Status.SUCCESS;
-            } catch (IOException e) {
-                log.error("Failed writing " + object + " into " + subDirectory + ". Cause: " + e.getMessage(), e);
-                return WritingResult.Status.FAILED;
-            }
-        });
+    public Mono<WritingResult<Post>> write(File subDirectory, Post post) {
+        return writePost(subDirectory, post)
+            .map(status -> new WritingResult<>(status, post));
     }
 
     public Mono<File> createSubDirectory(String name) {
@@ -64,13 +45,20 @@ public class JsonNodeWriterService {
         });
     }
 
-    private String resolveFileName(String requestName, JsonNode jsonNode) {
-        UnaryOperator<String> fileNameFormatter = id -> String.format("%s-%s.json", requestName, id);
-        return Optional.ofNullable(jsonNode.findValue("id"))
-            .map(JsonNode::asText)
-            .map(fileNameFormatter)
-            .filter(text -> text.length() <= 0xff) // max file name length (decimal 255)
-            .filter(text -> fileNamePattern.matcher(text).matches())
-            .orElseGet(() -> fileNameFormatter.apply(UUID.randomUUID().toString()));
+    private Mono<WritingResult.Status> writePost(File subDirectory, Post post) {
+        return Mono.fromCallable(() -> {
+            try {
+                File targetFile = new File(subDirectory, resolveFileName(post));
+                objectMapper.writeValue(targetFile, post);
+                return WritingResult.Status.SUCCESS;
+            } catch (IOException e) {
+                log.error("Failed writing post " + post.getId() + " into " + subDirectory + ". Cause: " + e.getMessage(), e);
+                return WritingResult.Status.FAILED;
+            }
+        });
+    }
+
+    private String resolveFileName(Post post) {
+        return "post_" + post.getId() + ".json";
     }
 }

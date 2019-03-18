@@ -2,15 +2,18 @@ package lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.model.Post;
 import lt.ro.fachmann.jsonarraywriter.jsonarraystreamwriter.model.WritingResult;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,39 +52,6 @@ public class JsonNodeWriterServiceTest {
             String datePattern = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}.[0-9]{2}.[0-9]{2}.[0-9]{3}Z";
             assertThat(subDirectory.getAbsolutePath())
                 .matches(".*json-node-writer-test" + fileSeparatorInPattern + subDirectoryName + fileSeparatorInPattern + subDirectoryName + "_" + datePattern);
-        });
-    }
-
-    @Test
-    public void writeValue_test() throws IOException {
-        // given
-        String subDirectoryName = "test2";
-        ObjectNode testPost = objectMapper.readValue(getClass().getClassLoader().getResourceAsStream("posts/test-post.json"), ObjectNode.class);
-
-        // when
-        Mono<WritingResult.Status> statusMono = service.writeValue(subDirectoryName, tempDirectory, testPost);
-
-        // then
-        statusMono.subscribe(status -> {
-            assertThat(status).isEqualTo(WritingResult.Status.SUCCESS);
-            assertThat(tempDirectory.listFiles()).contains(new File(tempDirectory, subDirectoryName + "-95.json"));
-        });
-    }
-
-    @Test
-    public void writeValue_testWhenNoId() throws IOException {
-        // given
-        String subDirectoryName = "test3";
-        ObjectNode testPost = objectMapper.readValue(getClass().getClassLoader().getResourceAsStream("posts/test-post-without-id.json"), ObjectNode.class);
-
-        // when
-        Mono<WritingResult.Status> statusMono = service.writeValue(subDirectoryName, tempDirectory, testPost);
-
-        // then
-        statusMono.subscribe(status -> {
-            assertThat(status).isEqualTo(WritingResult.Status.SUCCESS);
-            assertThat(tempDirectory.listFiles()).hasSize(1);
-            assertThat(tempDirectory.listFiles()[0].getName()).matches(subDirectoryName + "-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.json");
         });
     }
 }
